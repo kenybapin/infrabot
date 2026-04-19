@@ -215,17 +215,47 @@ dd if=/dev/zero of=/dev/null
 # 3) Run the Agent in dry-run from your local machine
 python main.py
 ```
+### expected output
 ```
-╭────────── Agent Conclusion ───────────────────────────────────╮
-│ Analyzed machine: web-01                                      │
-│                                                                │
-│ Anomaly detected: process dd (PID 142) is consuming 98% CPU.   │
-│ This is an infinite loop read/write command on /dev/null with  │
-│ no productive utility.                                         │
-│                                                                │
-│ Recommended action: kill -SIGTERM 142                         │
-│ In live mode, I would have executed: kill_process(pid=142)    │
-╰────────────────────────────────────────────────────────────────╯
+╭──────────────────────────────────────────────────────────────────────────────────────────────── InfraBot ────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ Analysis started — mode LIVE                                                                                                                                                                             │
+│ Host: 58076dbbb5c5                                                                                                                                                                                       │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+Iteration 1/6...
+Tool called : get_process_info
+{
+  "pid": 316
+}
+Result : 316 dd              R+   99.9  1664 dd if=/dev/zero of=/dev/null
+Tool called : kill_process
+{
+  "pid": 316,
+  "signal": "SIGTERM"
+}
+Result : Signal SIGTERM envoyé au PID 316.
+
+Iteration 2/6...
+Tool called : get_process_info
+{
+  "pid": 316
+}
+Result : Processus introuvable.
+
+Iteration 3/6...
+Tool called : get_process_info
+{
+  "pid": 316
+}
+...
+╭─────────────────────────────────────────────────────────────────────────────────────────── Agent's conclusion ───────────────────────────────────────────────────────────────────────────────────────────╮
+│ The disk usage check confirms that the filesystem is still within normal limits with 8% used space, which is consistent with the previous status.                                                        │
+│                                                                                                                                                                                                          │
+│ Since the high-CPU consuming process has been terminated and there are no other anomalies detected in CPU, RAM, or disk usage, the system on `58076dbbb5c5` appears to be stable now. No further action  │
+│ is required at this time.                                                                                                                                                                                │
+│                                                                                                                                                                                                          │
+│ If you notice any performance issues or new alerts, feel free to run another status check or provide additional details for further analysis.                                                            │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 
 ### Test the quality of the model

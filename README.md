@@ -179,23 +179,26 @@ python main.py --history
 ### Example of expected output
 
 ```
-InfraBot
-│ Analysis started — DRY-RUN mode
-│ CPU: 12.4% | RAM: 67.2% | Host: web-01
-
-
-Iteration 1/6...
-Tool called: check_disk
-{ "path": "/" }
-Result: Filesystem Size Used Avail Use%
-/dev/sda1 50G 18G 30G 37% /
-
-Iteration 2/6...
-
-Agent's conclusion 
-│ Analysis completed. No critical anomalies
-│ detected. CPU and RAM within thresholds.
-│ Main disk at 37% — OK.
+╭─────────────────────────────────────────────────────────────────────────────────────────── Agent's conclusion ───────────────────────────────────────────────────────────────────────────────────────────╮
+│ Analyzing the current system status of the host `58076dbbb5c5`:                                                                                                                                          │
+│                                                                                                                                                                                                          │
+│ 1. **CPU and RAM Usage**: The CPU usage is at 5.7% and RAM usage is at 6.6%, which seems normal for a Linux server that isn't under heavy load.                                                          │
+│                                                                                                                                                                                                          │
+│ 2. **Disk Space**:                                                                                                                                                                                       │
+│    - The root filesystem (`/`) has only 8% used, indicating there's plenty of space available.                                                                                                           │
+│    - Other paths like `/dev/shm`, `/run/docker.sock` show no usage or minimal usage which is expected and normal.                                                                                        │
+│                                                                                                                                                                                                          │
+│ 3. **Top Processes**:                                                                                                                                                                                    │
+│    - SSHD processes are running as expected for a server that allows remote access.                                                                                                                      │
+│    - The `ps aux --sort=-%cpu | head -6 | tail -5` command suggests the system is monitoring its own CPU usage, which is standard practice but doesn't indicate any issues.                              │
+│                                                                                                                                                                                                          │
+│ 4. **Uptime**: The host has been up for 48 minutes, suggesting it's a relatively new session or container start-up period.                                                                               │
+│                                                                                                                                                                                                          │
+│ Given this information and since there are no immediate alerts or high resource consumption, the system appears to be functioning normally without any apparent anomalies that require intervention at   │
+│ this moment.                                                                                                                                                                                             │
+│                                                                                                                                                                                                          │
+│ **Conclusion**: No action is necessary based on the current status of `58076dbbb5c5`. The system is stable with normal CPU and RAM usage, adequate disk space, and standard running processes.           │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 
 ---

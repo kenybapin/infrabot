@@ -1,7 +1,4 @@
 # InfraBot — Local AI Agent with Ollama
-
-InfraBot is local AI agent that connects via SSH to a Docker container or a remote Linux server to analyze its real-time state—CPU, RAM, disk, and processes. It submits these metrics to a local LLM (qwen2.5:14b via Ollama), which uses a ReAct reasoning loop to detect anomalies, trigger diagnostic tools, and propose or execute corrective actions (service restarts, killing processes, disk analysis). Every decision is logged locally, and a desktop notification is sent via notify-send. The entire system runs fully locally, with no external data transmission.
-
 ---
 
 ## Summary

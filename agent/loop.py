@@ -11,8 +11,8 @@ from collectors.remote import get_snapshot, get_containers
 
 console = Console()
 
-SYSTEM_PROMPT = """You are an expert Linux and Docker SRE.
-You are provided with a system state snapshot of the machine {hostname}.
+SYSTEM_PROMPT = """You are an expert Linux and Docker SRE operating directly within a Linux server or container environment.
+You are granted access to the live environment and system state of {hostname}.
 
 Your role:
 1. Analyze the state and detect anomalies
@@ -43,17 +43,15 @@ def run_agent(config: dict, dry_run: bool = True) -> str:
 
     mode_label = "[yellow]DRY-RUN[/yellow]" if dry_run else "[red]LIVE[/red]"
     host = snapshot["host"]
-    cpu = snapshot["cpu"]["percent"]
-    ram = snapshot["ram"]["percent"]
     console.print(Panel(
-        f"Analysis started — mode {mode_label}\n"
-        f"CPU: {cpu}% | RAM: {ram}% | Host: {host}",
-        title="InfraBot",
-        border_style="blue"
+    f"Analysis started — mode {mode_label}\n"
+    f"Host: {host}",
+    title="InfraBot",
+    border_style="blue"
     ))
 
     messages = [
-        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "system", "content": SYSTEM_PROMPT.format(hostname=host)},
         {"role": "user", "content": f"Current system status :\n{json.dumps(context, indent=2, ensure_ascii=False)}"}
     ]
 
@@ -86,16 +84,14 @@ def run_agent(config: dict, dry_run: bool = True) -> str:
             console.print(f"[cyan]Tool called :[/cyan] {tool_name}")
             console.print(Syntax(json.dumps(tool_args, indent=2), "json", theme="monokai"))
 
-            result = execute_tool(tool_name, tool_args, dry_run)
+            result = execute_tool(tool_name, tool_args, dry_run, config)
             console.print(f"[green]Result :[/green] {result}")
 
             save_decision(config, {
                 "tool": tool_name,
                 "args": tool_args,
                 "result": str(result),
-                "dry_run": dry_run,
-                "snapshot_cpu": cpu,
-                "snapshot_ram": ram
+                "dry_run": dry_run
             })
 
             messages.append({

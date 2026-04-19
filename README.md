@@ -94,7 +94,7 @@ mkdir infrabot && cd infrabot
 python3 -m venv .venv
 source .venv/bin/activate
 
-pip install openai psutil docker rich pyyaml paramiko
+python3 -m pip install openai psutil docker rich pyyaml paramiko
 ```
 
 ---

@@ -107,44 +107,47 @@ TOOLS = [
 ]
 
 
-def execute_tool(name: str, args: dict, dry_run: bool) -> str:
+def execute_tool(name: str, args: dict, dry_run: bool, config: dict) -> str:
+
     if name == "restart_service":
         if dry_run:
-            return f"[DRY-RUN] Would have restarted the service: {args['service']}"
-        return restart_service(args["service"])
+            return f"[DRY-RUN] Aurait redémarré le service : {args['service']}"
+        return restart_service(args["service"], config)
 
     elif name == "kill_process":
         if dry_run:
-            return f"[DRY-RUN] Would have killed the PID {args['pid']} with {args.get('signal', 'SIGTERM')}"
-        return kill_process(args["pid"], args.get("signal", "SIGTERM"))
+            return f"[DRY-RUN] Aurait tué le PID {args['pid']} avec {args.get('signal', 'SIGTERM')}"
+        return kill_process(args["pid"], args.get("signal", "SIGTERM"), config)
 
     elif name == "get_process_info":
-        return get_process_info(args.get("pid"), args.get("name"))
+        return get_process_info(args.get("pid"), args.get("name"), config)
 
     elif name == "check_disk":
-        return _check_disk(args["path"])
+        return _check_disk(args["path"], config)
 
     elif name == "list_large_files":
-        return _list_large_files(args["path"], args.get("top_n", 10))
+        return _list_large_files(args["path"], args.get("top_n", 10), config)
 
     elif name == "send_alert":
         return send_notification(args["message"], args.get("severity", "warning"))
 
-    return f"Unknown tool: {name}"
+    return f"Outil inconnu : {name}"
 
 
-def _check_disk(path: str) -> str:
-    result = subprocess.run(["df", "-h", path], capture_output=True, text=True)
-    return result.stdout if result.returncode == 0 else f"Error: {result.stderr}"
+def _check_disk(path: str, config: dict) -> str:
+    from collectors.remote import get_ssh_client, run_command
+    client = get_ssh_client(config)
+    result = run_command(client, f"df -h {path}")
+    client.close()
+    return result or f"Erreur sur {path}"
 
 
-def _list_large_files(path: str, top_n: int) -> str:
-    result = subprocess.run(
-        ["du", "-sh", f"{path}/*"],
-        capture_output=True, text=True, shell=False
-    )
-    lines = [l for l in result.stdout.strip().split("\n") if l]
-    return "\n".join(lines[:top_n]) if lines else "No files found"
+def _list_large_files(path: str, top_n: int, config: dict) -> str:
+    from collectors.remote import get_ssh_client, run_command
+    client = get_ssh_client(config)
+    result = run_command(client, f"du -sh {path}/* 2>/dev/null | sort -rh | head -{top_n}")
+    client.close()
+    return result or "Aucun fichier trouvé"
 
 def _exec_in_container(container: str, command: str) -> str:
     from collectors.remote import get_ssh_client, run_command

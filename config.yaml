@@ -1,0 +1,33 @@
+# ── Model & Ollama connection ────────────────────────────────────────────────
+agent:
+  model: "qwen2.5:14b"              # Local model via Ollama
+  ollama_url: "http://localhost:11434/v1"
+  max_iterations: 6                 # Max number of Reason→Act→Observe loops
+  interval_minutes: 5               # Analysis frequency in daemon mode
+
+# ── Execution mode ───────────────────────────────────────────────────────────
+mode:
+  dry_run: true                     # true = analysis only, false = real actions
+
+# ── Alert thresholds ─────────────────────────────────────────────────────────
+thresholds:
+  cpu_percent: 85                   # Alert if CPU > 85%
+  ram_percent: 88                   # Alert if RAM > 88%
+  disk_percent: 90                  # Alert if disk > 90%
+
+# ── Desktop notifications ────────────────────────────────────────────────────
+notifications:
+  enabled: true                     # false to disable notify-send
+
+# ── Logging ──────────────────────────────────────────────────────────────────
+audit:
+  log_path: "audit/decisions.jsonl" # Append-only decision log file
+
+# ── SSH Target ───────────────────────────────────────────────────────────────
+target:
+  host: "localhost"                 # Container address or remote server
+  port: 2222                        # SSH port (22 for a standard server)
+  user: "root"                      # SSH user
+  key_path: "~/.ssh/id_rsa"         # SSH private key path
+  docker: false                     # false = do not query Docker,
+                                    # analyze container internals only

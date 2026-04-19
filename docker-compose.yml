@@ -1,0 +1,8 @@
+services:
+  web-01:
+    build: .
+    container_name: web-01
+    ports:
+      - "2222:22"        # SSH accessible sur localhost:2222
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # accès Docker depuis le conteneur

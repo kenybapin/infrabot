@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-InfraBot — Agent IA DevOps local (Ollama + Linux/Docker)
+InfraBot — Local AI Agent (Ollama + Linux/Docker)
 Usage:
-    python main.py              # Lance une analyse en dry-run
-    python main.py --live       # Lance une analyse avec actions réelles
-    python main.py --daemon     # Tourne en continu (interval depuis config.yaml)
-    python main.py --history    # Affiche les dernières décisions
+    python main.py # Runs an analysis in dry-run
+    python main.py --live # Runs an analysis with real actions
+    python main.py --daemon # Runs continuously (interval from config.yaml)
+    python main.py --history # Shows the latest decisions
 """
 
 import argparse
@@ -27,10 +27,10 @@ def load_config(path: str = "config.yaml") -> dict:
 
 def show_history() -> None:
     decisions = get_recent_decisions(20)
-    table = Table(title="Dernières décisions InfraBot")
+    table = Table(title="Latest InfraBot decisions")
     table.add_column("Timestamp", style="dim")
-    table.add_column("Outil")
-    table.add_column("Résultat")
+    table.add_column("Tool")
+    table.add_column("Result")
     table.add_column("Mode")
 
     for d in decisions:
@@ -41,11 +41,11 @@ def show_history() -> None:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="InfraBot — Agent IA DevOps local")
-    parser.add_argument("--live", action="store_true", help="Mode live (actions réelles)")
-    parser.add_argument("--daemon", action="store_true", help="Tourne en continu")
-    parser.add_argument("--history", action="store_true", help="Affiche l'historique")
-    parser.add_argument("--config", default="config.yaml", help="Chemin config")
+    parser = argparse.ArgumentParser(description="InfraBot — Agent IA local")
+    parser.add_argument("--live", action="store_true", help="Live mode (real actions)")
+    parser.add_argument("--daemon", action="store_true", help="Runs continuously")
+    parser.add_argument("--history", action="store_true", help="Shows history")
+    parser.add_argument("--config", default="config.yaml", help="Config path")
     args = parser.parse_args()
 
     config = load_config(args.config)
@@ -57,25 +57,25 @@ def main():
     dry_run = not args.live
 
     if dry_run:
-        console.print("[yellow]Mode DRY-RUN activé — aucune action réelle[/yellow]")
+        console.print("[yellow]DRY-RUN mode activated — no real action[/yellow]")
     else:
-        console.print("[red bold]Mode LIVE activé — les actions seront exécutées ![/red bold]")
-        confirm = input("Confirmer ? (oui/non) : ")
-        if confirm.lower() != "oui":
-            console.print("Annulé.")
+        console.print("[red bold]LIVE mode activated — actions will be executed![/red bold]")
+        confirm = input("Confirm ? (yes/no) : ")
+        if confirm.lower() != "yes":
+            console.print("Canceled.")
             return
 
     if args.daemon:
         interval_min = config["agent"]["interval_minutes"]
         interval_sec = interval_min * 60
-        console.print(f"[blue]Mode daemon — analyse toutes les {interval_min} minutes[/blue]")
+        console.print(f"[blue]Daemon mode — scans all {interval_min} minutes[/blue]")
         while True:
             try:
                 run_agent(config, dry_run=dry_run)
-                console.print(f"\n[dim]Prochaine analyse dans {interval_min} min...[/dim]")
+                console.print(f"\n[dim]Next analysis in {interval_min} min...[/dim]")
                 time.sleep(interval_sec)
             except KeyboardInterrupt:
-                console.print("\n[yellow]Daemon arrêté.[/yellow]")
+                console.print("\n[yellow]Daemon stopped.[/yellow]")
                 break
     else:
         run_agent(config, dry_run=dry_run)
